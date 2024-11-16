@@ -38,18 +38,26 @@ class TestPasswordManager(unittest.TestCase):
         """
         Test that saving a password works as expected.
         """
-        self.manager.save_password("example.com", "user@example.com", "password123")
+        self.manager.save_password("example.com", "user@example.com", "pasSswo?rd123")
         passwords = self.manager.get_passwords()
         self.assertEqual(len(passwords), 1)
-        self.assertEqual(passwords[0], ("example.com", "user@example.com", "password123"))
+        self.assertEqual(passwords[0], ("example.com", "user@example.com", "pasSswo?rd123"))
+
+    def test_save_weak_password(self):
+        """
+        Test that saving a weak password returns an appropriate validation error.
+        """
+        weak_password = "password123"
+        result = self.manager.save_password("example.com", "user@example.com", weak_password)
+        self.assertIn("Password is too weak", result)
 
     def test_search_password(self):
         """
         Test that searching for a password works correctly.
         """
-        self.manager.save_password("example.com", "user@example.com", "password123")
+        self.manager.save_password("example.com", "user@example.com", "pasSswo?rd123")
         result = self.manager.search_password("example.com")
-        self.assertEqual(result, "Website: example.com, Email: user@example.com, Password: password123")
+        self.assertEqual(result, "Website: example.com, Email: user@example.com, Password: pasSswo?rd123")
 
     def test_search_password_not_found(self):
         """
@@ -62,18 +70,18 @@ class TestPasswordManager(unittest.TestCase):
         """
         Test that searching for a password is case-insensitive.
         """
-        self.manager.save_password("Example.com", "user@example.com", "password123")
+        self.manager.save_password("Example.com", "user@example.com", "pasSswo?rd123")
         result = self.manager.search_password("example.com")
-        self.assertEqual(result, "Website: Example.com, Email: user@example.com, Password: password123")
+        self.assertEqual(result, "Website: Example.com, Email: user@example.com, Password: pasSswo?rd123")
 
     def test_save_and_load_multiple_passwords(self):
         """
         Test saving and loading multiple passwords.
         """
         passwords_to_save = [
-            ("example.com", "user1@example.com", "password1"),
-            ("test.com", "user2@test.com", "password2"),
-            ("sample.org", "user3@sample.org", "password3"),
+            ("example.com", "user1@example.com", "pasSswo?rd123"),
+            ("test.com", "user2@test.com", "pasSswo?rd123"),
+            ("sample.org", "user3@sample.org", "pasSswo?rd123"),
         ]
 
         for website, email, password in passwords_to_save:
@@ -81,15 +89,15 @@ class TestPasswordManager(unittest.TestCase):
 
         passwords = self.manager.get_passwords()
         self.assertEqual(len(passwords), 3)
-        self.assertIn(("example.com", "user1@example.com", "password1"), passwords)
-        self.assertIn(("test.com", "user2@test.com", "password2"), passwords)
-        self.assertIn(("sample.org", "user3@sample.org", "password3"), passwords)
+        self.assertIn(("example.com", "user1@example.com", "pasSswo?rd123"), passwords)
+        self.assertIn(("test.com", "user2@test.com", "pasSswo?rd123"), passwords)
+        self.assertIn(("sample.org", "user3@sample.org", "pasSswo?rd123"), passwords)
 
     def test_save_password_with_special_characters(self):
         """
         Test saving a password with special characters.
         """
-        special_password = "!@#$%^&*()_+{}|:\"<>?"
+        special_password = "pA1!@#$%^&*()_+{}|:\"<>?"
         self.manager.save_password("example.com", "user@example.com", special_password)
         passwords = self.manager.get_passwords()
         self.assertEqual(passwords[0], ("example.com", "user@example.com", special_password))
