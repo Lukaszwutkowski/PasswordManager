@@ -1,89 +1,66 @@
-import os
-from cryptography.fernet import Fernet
+from data_manager import DataManager
+from utils.encryption import EncryptionManager
 
 class PasswordManager:
     """
-        Manages saving, retrieving, and searching for passwords.
+    Manages passwords by encrypting them and interacting with the DataManager for storage.
+    """
 
-        Attributes:
-            file_path (str): Path to the file where passwords are stored.
-            key_file (str): Path to the file storing the encryption key.
+    def __init__(self, db_path="data/passwords.db", key_file="data/key.key"):
         """
-    def __init__(self, file_path, key_file="data/key.key"):
-        """
-                Initializes the PasswordManager and loads or generates the encryption key.
+        Initializes the PasswordManager.
 
-                Args:
-                    file_path (str): Path to the file where passwords are stored.
-                    key_file (str): Path to the encryption key file. Defaults to "data/key.key".
+        Args:
+            db_path (str): Path to the SQLite database file.
+            key_file (str): Path to the encryption key file.
         """
-        self.file_path = file_path
-        self.key_file = key_file
-        self.cipher_suite = self.load_or_generate_key()
-
-    def load_or_generate_key(self):
-        """
-        Loads the encryption key from the file or generates a new one.
-
-        Returns:
-            Fernet: Cipher object for encryption and decryption.
-        """
-        if not os.path.exists(self.key_file):
-            key = Fernet.generate_key()
-            with open(self.key_file, "wb") as key_file:
-                key_file.write(key)
-        else:
-            with open(self.key_file, "rb") as key_file:
-                key = key_file.read()
-        return Fernet(key)
+        self.data_manager = DataManager(db_path=db_path)
+        self.encryption_manager = EncryptionManager(key_file=key_file)
 
     def save_password(self, website, email, password):
         """
-                Saves an encrypted password to the file.
+        Encrypts and saves a password to the database.
 
-                Args:
-                    website (str): The website name.
-                    email (str): The email or username.
-                    password (str): The password to save.
+        Args:
+            website (str): The website name.
+            email (str): The email or username.
+            password (str): The plaintext password to save.
         """
-        encrypted_password = self.cipher_suite.encrypt(password.encode())
-        with open(self.file_path, "a") as file:
-            file.write(f"{website}:{email}:{encrypted_password.decode()}\n")
+        encrypted_password = self.encryption_manager.encrypt(password)
+        self.data_manager.save_password(website, email, encrypted_password)
+
+    def get_passwords(self):
+        """
+        Retrieves all decrypted passwords from the database.
+
+        Returns:
+            list of tuples: List of (website, email, decrypted password).
+        """
+        passwords = self.data_manager.get_passwords()
+        return [
+            (website, email, self.encryption_manager.decrypt(password))
+            for website, email, password in passwords
+        ]
 
     def search_password(self, website):
         """
-        Searches for a password by website name.
+        Searches for a password by website.
 
         Args:
-            website (str): The name of the website.
+            website (str): The website name.
 
         Returns:
-            str: The details of the website, email, and password, or "Not found".
+            str: Details of the website, email, and password, or "Not found".
         """
-        passwords = self.read_passwords()
-        for site, email, password in passwords:
-            if site.lower() == website.lower():
-                return f"Website: {site}, Email: {email}, Password: {password}"
+        result = self.data_manager.search_password(website)
+        if result:
+            website, email, encrypted_password = result
+            password = self.encryption_manager.decrypt(encrypted_password)
+            return f"Website: {website}, Email: {email}, Password: {password}"
         return "Not found"
 
-    def read_passwords(self):
+    def close(self):
         """
-        Reads all passwords from the file and decrypts them.
-
-        Returns:
-            list: A list of tuples containing website, email, and decrypted password.
+        Closes the database connection.
         """
-        if not os.path.exists(self.file_path):
-            return []
-
-        passwords = []
-        with open(self.file_path, "r") as file:
-            for line in file:
-                try:
-                    website, email, encrypted_password = line.strip().split(":")
-                    decrypted_password = self.cipher_suite.decrypt(encrypted_password.encode()).decode()
-                    passwords.append((website, email, decrypted_password))
-                except ValueError:
-                    # Skip malformed lines
-                    pass
-        return passwords
+        self.data_manager.close()
