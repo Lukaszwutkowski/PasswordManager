@@ -52,13 +52,17 @@ class DataManager:
             email (str): The email or username.
             password (str): The encrypted password to save.
         """
-        conn = self._create_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO passwords (website, email, password)
-            VALUES (?, ?, ?)
-        """, (website, email, password))
-        conn.commit()
+        try:
+            conn = self._create_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                    INSERT INTO passwords (website, email, password)
+                    VALUES (?, ?, ?)
+                """, (website, email, password))
+            conn.commit()
+        except sqlite3.Error as e:
+            print(f"Error saving password: {str(e)}")
+            raise
 
     def get_passwords(self):
         """
@@ -68,9 +72,14 @@ class DataManager:
             list of tuples: A list of (website, email, password) entries.
         """
         conn = self._create_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT website, email, password FROM passwords")
-        return cursor.fetchall()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT website, email, password FROM passwords")
+            results = cursor.fetchall()  # Pobranie wszystkich danych
+            return results
+        except sqlite3.Error as e:
+            print(f"Error retrieving passwords: {str(e)}")
+            raise
 
     def search_password(self, website):
         """
@@ -94,10 +103,16 @@ class DataManager:
         """
         Deletes all entries in the passwords table.
         """
-        conn = self._create_connection()
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM passwords")
-        conn.commit()
+        try:
+            conn = self._create_connection()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM passwords")
+            conn.commit()
+        except sqlite3.Error as e:
+            print(f"Error clearing table: {str(e)}")
+            raise
+        finally:
+            conn.close()
 
     def close(self):
         """
