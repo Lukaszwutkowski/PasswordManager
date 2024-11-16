@@ -1,5 +1,6 @@
 from data_manager import DataManager
 from utils.encryption import EncryptionManager
+from utils.password_generation import generate_strong_password
 
 class PasswordManager:
     """
@@ -58,6 +59,18 @@ class PasswordManager:
             password = self.encryption_manager.decrypt(encrypted_password)
             return f"Website: {website}, Email: {email}, Password: {password}"
         return "Not found"
+
+    def generate_strong_password(self, length=12):
+        """
+        Generates a strong password.
+
+        Args:
+            length (int): The desired length of the password. Default is 12.
+
+        Returns:
+            str: A strong, randomly generated password.
+        """
+        return generate_strong_password(length)
 
     def close(self):
         """
