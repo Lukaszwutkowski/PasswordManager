@@ -23,14 +23,25 @@ class EncryptionManager:
         Returns:
             Fernet: Cipher object for encryption and decryption.
         """
-        if not os.path.exists(self.key_file):
+        if os.path.exists(self.key_file):
+            try:
+                with open(self.key_file, "rb") as key_file:
+                    key = key_file.read()
+                    # Validate the key
+                    return Fernet(key)
+            except (ValueError, Exception) as e:
+                print(f"Invalid key detected. Generating a new one. Error: {e}")
+                # If invalid key detected - Generate a new one
+                key = Fernet.generate_key()
+                with open(self.key_file, "wb") as key_file:
+                    key_file.write(key)
+                return Fernet(key)
+        else:
+            # File does not exist - Generate a new one
             key = Fernet.generate_key()
             with open(self.key_file, "wb") as key_file:
                 key_file.write(key)
-        else:
-            with open(self.key_file, "rb") as key_file:
-                key = key_file.read()
-        return Fernet(key)
+            return Fernet(key)
 
     def encrypt(self, plaintext):
         """
