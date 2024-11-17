@@ -1,4 +1,5 @@
 import logging
+import os
 
 class Logger:
     """
@@ -7,14 +8,23 @@ class Logger:
 
     def __init__(self, log_file="logs/app.log"):
         """
-        Initializes the Logger and sets up the logging configuration.
+        Initializes the logger and sets up the file handler.
 
         Args:
             log_file (str): Path to the log file.
         """
+        # Ensure the directory for the log file exists
+        log_dir = os.path.dirname(log_file)
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)  # Create the directory if it doesn't exist
+
+        # Configure the logger
         self.logger = logging.getLogger("PasswordManagerLogger")
         self.logger.setLevel(logging.DEBUG)
         file_handler = logging.FileHandler(log_file)
+        file_handler.setLevel(logging.DEBUG)
+
+        # Set log format
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
         self.logger.addHandler(file_handler)
