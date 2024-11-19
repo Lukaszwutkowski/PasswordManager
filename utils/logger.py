@@ -40,3 +40,6 @@ class Logger:
     def warning(self, message):
         """Logs a warning-level message."""
         self.logger.warning(message)
+
+    def debug(self, message):
+        self.logger.debug(message)

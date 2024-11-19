@@ -1,123 +1,206 @@
 import sqlite3
+from contextlib import contextmanager
+from utils.encryption import EncryptionManager
+
 
 class DataManager:
     """
     Manages data persistence using SQLite for storing passwords.
+    Provides automatic handling of database connections.
     """
 
-    def __init__(self, db_path="data/passwords.db"):
+    def __init__(self, db_path="data/passwords.db", key_file="data/key.key", key=None):
         """
-        Initializes the DataManager and creates the database and table if they do not exist.
+        Initializes the DataManager and ensures that the necessary tables exist.
 
         Args:
             db_path (str): Path to the SQLite database file.
+            key_file (str): Path to the encryption key file.
+            key (bytes): Encryption key. If provided, key_file is ignored.
         """
         self.db_path = db_path
-        self.connection = None
-        self._create_table()
+        self.key_file = key_file
+        self.key = key
+        self.encryption_manager = EncryptionManager(key_file=self.key_file, key=self.key)
+        self.ensure_tables_exist()
+        self.ensure_admin_user()
 
-    def _create_connection(self):
+    @contextmanager
+    def database_connection(self):
         """
-        Creates or returns an existing connection to the SQLite database.
+        A context manager for handling database connections.
+        Ensures that the connection is closed after use.
+
+        Yields:
+            sqlite3.Connection: An open database connection.
+        """
+        conn = None
+        try:
+            conn = sqlite3.connect(self.db_path)
+            yield conn
+        except sqlite3.Error as e:
+            print(f"Database connection error: {str(e)}")
+        finally:
+            if conn:
+                conn.close()
+
+    def ensure_tables_exist(self):
+        """
+        Ensures that the required database tables exist.
+        """
+        with self.database_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS passwords (
+                    id INTEGER PRIMARY KEY,
+                    website TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    password TEXT NOT NULL
+                )
+            """)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY,
+                    username TEXT NOT NULL,
+                    password TEXT NOT NULL
+                )
+            """)
+            conn.commit()
+
+    def ensure_admin_user(self):
+        """
+        Ensures that the default admin user exists in the database.
+        Creates the admin user if it does not exist.
+        """
+        default_username = "admin"
+        default_password = "password123"
+
+        with self.database_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM users WHERE username = ?", (default_username,))
+            admin_exists = cursor.fetchone()[0] > 0
+
+            if not admin_exists:
+                encrypted_password = self.encryption_manager.encrypt(default_password)
+                cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)",
+                               (default_username, encrypted_password))
+                conn.commit()
+                print("Default admin user created with username 'admin' and password 'password123'.")
+            else:
+                print("Admin user already exists.")
+
+    def get_user_by_username(self, username):
+        """
+        Retrieves a user's encrypted password by their username.
+
+        Args:
+            username (str): The username to search for.
 
         Returns:
-            sqlite3.Connection: A connection object to the SQLite database.
+            tuple or None: (encrypted_password,) if the user exists, otherwise None.
         """
-        if not self.connection:
-            self.connection = sqlite3.connect(self.db_path)
-        return self.connection
+        with self.database_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT password FROM users WHERE username = ?", (username,))
+            return cursor.fetchone()
 
-    def _create_table(self):
+    def update_admin_password(self, new_password):
         """
-        Creates the passwords table in the database if it does not already exist.
+        Updates the admin user's password in the database.
+
+        Args:
+            new_password (str): The new password to encrypt and save.
         """
-        conn = self._create_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS passwords (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                website TEXT NOT NULL,
-                email TEXT NOT NULL,
-                password TEXT NOT NULL
-            )
-        """)
-        conn.commit()
+        encrypted_password = self.encryption_manager.encrypt(new_password)
+        with self.database_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE users SET password = ? WHERE username = 'admin'", (encrypted_password,))
+            conn.commit()
 
     def save_password(self, website, email, password):
         """
-        Saves a password to the database.
+        Saves an encrypted password to the database.
 
         Args:
             website (str): The website name.
             email (str): The email or username.
             password (str): The encrypted password to save.
         """
-        try:
-            conn = self._create_connection()
+        with self.database_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                    INSERT INTO passwords (website, email, password)
-                    VALUES (?, ?, ?)
-                """, (website, email, password))
+                INSERT INTO passwords (website, email, password)
+                VALUES (?, ?, ?)
+            """, (website, email, password))
             conn.commit()
-        except sqlite3.Error as e:
-            print(f"Error saving password: {str(e)}")
-            raise
 
     def get_passwords(self):
         """
-        Retrieves all passwords from the database.
+        Retrieves all passwords stored in the database.
 
         Returns:
             list of tuples: A list of (website, email, password) entries.
         """
-        conn = self._create_connection()
-        try:
+        with self.database_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT website, email, password FROM passwords")
-            results = cursor.fetchall()  # Pobranie wszystkich danych
-            return results
-        except sqlite3.Error as e:
-            print(f"Error retrieving passwords: {str(e)}")
-            raise
+            return cursor.fetchall()
 
     def search_password(self, website):
         """
         Searches for a password in the database by website name.
 
         Args:
-            website (str): The name of the website.
+            website (str): The website to search for.
 
         Returns:
             tuple or None: A tuple (website, email, password) if found, otherwise None.
         """
-        conn = self._create_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT website, email, password FROM passwords
-            WHERE LOWER(website) = ?
-        """, (website.lower(),))  # Porównywanie małych liter w SQL
-        return cursor.fetchone()
-
-    def clear_table(self):
-        """
-        Deletes all entries in the passwords table.
-        """
-        try:
-            conn = self._create_connection()
+        with self.database_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("DELETE FROM passwords")
-            conn.commit()
-        except sqlite3.Error as e:
-            print(f"Error clearing table: {str(e)}")
-            raise
-        finally:
-            conn.close()
+            cursor.execute("""
+                SELECT website, email, password FROM passwords
+                WHERE LOWER(website) = ?
+            """, (website.lower(),))
+            return cursor.fetchone()
 
-    def close(self):
+    def update_password(self, website, new_encrypted_password):
         """
-        Closes the database connection.
+        Updates the password for a given website.
+
+        Args:
+            website (str): The website name.
+            new_encrypted_password (str): The new encrypted password to update.
         """
-        if self.connection:
-            self.connection.close()
-            self.connection = None
+        with self.database_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE passwords
+                SET password = ?
+                WHERE LOWER(website) = ?
+            """, (new_encrypted_password, website.lower()))
+            conn.commit()
+
+    def delete_password(self, website):
+        """
+        Deletes a password for the given website from the database.
+
+        Args:
+            website (str): The website whose password needs to be deleted.
+        """
+        with self.database_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM passwords WHERE LOWER(website) = ?", (website.lower(),))
+            conn.commit()
+
+    def clear_table(self, table_name="passwords"):
+        """
+        Clears all data from a specified table.
+
+        Args:
+            table_name (str): The name of the table to clear.
+        """
+        with self.database_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(f"DELETE FROM {table_name}")
+            conn.commit()
