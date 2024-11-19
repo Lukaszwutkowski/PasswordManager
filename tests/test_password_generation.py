@@ -1,6 +1,6 @@
 import unittest
 from utils.password_generation import generate_strong_password
-from utils.password_validation import validate_password_strength
+from utils.password_validation import PasswordValidator
 
 class TestPasswordGeneration(unittest.TestCase):
     """
@@ -19,7 +19,7 @@ class TestPasswordGeneration(unittest.TestCase):
         Test that the generated password is strong and passes validation.
         """
         password = generate_strong_password(length=12)
-        is_valid, messages = validate_password_strength(password)
+        is_valid, messages = PasswordValidator.validate_password_strength(password)
         self.assertTrue(is_valid)
         self.assertEqual(len(messages), 0)
 

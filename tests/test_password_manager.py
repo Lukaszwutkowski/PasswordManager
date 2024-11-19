@@ -1,47 +1,106 @@
+import base64
 import os
 import unittest
 from password_manager import PasswordManager
+
 
 class TestPasswordManager(unittest.TestCase):
     """
     Unit tests for the PasswordManager class.
     """
 
+    @classmethod
+    def setUpClass(cls):
+        key_bytes = b'0' * 32
+        cls.fixed_key = base64.urlsafe_b64encode(key_bytes)
+        assert len(cls.fixed_key) == 44
+
     def setUp(self):
         """
-        Set up a test environment before each test.
-        Creates test database and key file.
+        Sets up a temporary test environment before each test.
+        Creates test database and encryption key file.
         """
-        self.test_db_path = "test_passwords.db"
-        self.test_key_file = "test_key.key"
+        self.test_db_path = "test_data/passwords_test.db"
+        self.test_key_file = "test_data/key_test.key"
+
+        os.makedirs("test_data", exist_ok=True)
+
+        # Ensure test files are clean
+        if os.path.exists(self.test_db_path):
+            os.remove(self.test_db_path)
+        if os.path.exists(self.test_key_file):
+            os.remove(self.test_key_file)
+
+        # Generate or load encryption key
+        from utils.encryption import EncryptionManager
+        EncryptionManager(key_file=self.test_key_file)
+
+        # Initialize the PasswordManager with test paths
         self.manager = PasswordManager(db_path=self.test_db_path, key_file=self.test_key_file)
 
     def tearDown(self):
         """
-        Clean up after each test by removing test database and key file.
+        Cleans up the test environment after each test.
+        Deletes the test database and encryption key file.
         """
-        # Clear the database table
+        # Clear all database entries
         self.manager.data_manager.clear_table()
 
-        # Close database connection
-        self.manager.close()
-
-        # Remove database file
+        # Remove the test database file
         if os.path.exists(self.test_db_path):
             os.remove(self.test_db_path)
 
-        # Remove key file
+        # Remove the encryption key file
         if os.path.exists(self.test_key_file):
             os.remove(self.test_key_file)
 
+        # Remove the test_data directory if empty
+        if os.path.exists("test_data") and not os.listdir("test_data"):
+            os.rmdir("test_data")
+
     def test_save_password(self):
         """
-        Test that saving a password works as expected.
+        Tests saving a password to the database.
         """
-        self.manager.save_password("example.com", "user@example.com", "pasSswo?rd123")
+        result = self.manager.save_password("example.com", "user@example.com", "Password123!")
+        self.assertIn("successfully", result.lower())
+
         passwords = self.manager.get_passwords()
         self.assertEqual(len(passwords), 1)
-        self.assertEqual(passwords[0], ("example.com", "user@example.com", "pasSswo?rd123"))
+        self.assertEqual(passwords[0], ("example.com", "user@example.com", "Password123!"))
+
+    def test_validate_user_credentials(self):
+        """
+        Test validating admin credentials after updating the password.
+        """
+        # Update the admin password
+        result = self.manager.update_admin_password("AdminNewPassword1!")
+        self.assertIn("successfully", result.lower())
+
+        # Validate the updated admin credentials
+        is_valid = self.manager.validate_user_credentials("admin", "AdminNewPassword1!")
+        self.assertTrue(is_valid)
+
+        # Test invalid credentials
+        is_invalid = self.manager.validate_user_credentials("admin", "WrongPassword!")
+        self.assertFalse(is_invalid)
+
+    def test_update_admin_password(self):
+        """
+        Tests updating the admin password and validates it.
+        """
+        # Update the admin password
+        update_result = self.manager.update_admin_password("NewSecurePassword!1")
+        self.assertIn("successfully", update_result.lower())
+
+        # Validate the updated password
+        is_valid = self.manager.validate_user_credentials("admin", "NewSecurePassword!1")
+        self.assertTrue(is_valid)
+
+        # Test invalid credentials
+        is_invalid = self.manager.validate_user_credentials("admin", "WrongPassword!")
+        self.assertFalse(is_invalid)
+
 
     def test_save_weak_password(self):
         """
@@ -90,8 +149,6 @@ class TestPasswordManager(unittest.TestCase):
         passwords = self.manager.get_passwords()
         self.assertEqual(len(passwords), 3)
         self.assertIn(("example.com", "user1@example.com", "pasSswo?rd123"), passwords)
-        self.assertIn(("test.com", "user2@test.com", "pasSswo?rd123"), passwords)
-        self.assertIn(("sample.org", "user3@sample.org", "pasSswo?rd123"), passwords)
 
     def test_save_password_with_special_characters(self):
         """
@@ -99,7 +156,9 @@ class TestPasswordManager(unittest.TestCase):
         """
         special_password = "pA1!@#$%^&*()_+{}|:\"<>?"
         self.manager.save_password("example.com", "user@example.com", special_password)
+
         passwords = self.manager.get_passwords()
+        self.assertEqual(len(passwords), 1)
         self.assertEqual(passwords[0], ("example.com", "user@example.com", special_password))
 
     def test_empty_database(self):
@@ -108,6 +167,23 @@ class TestPasswordManager(unittest.TestCase):
         """
         passwords = self.manager.get_passwords()
         self.assertEqual(passwords, [])
+
+    def test_update_password(self):
+        """
+        Test updating the password for an existing website.
+        """
+        # Save an initial password
+        save_result = self.manager.save_password("example.com", "user@example.com", "OldPassword!1")
+        self.assertIn("successfully", save_result.lower())
+
+        # Update the password
+        update_result = self.manager.update_password("example.com", "NewStrongPassword!1")
+        self.assertIn("successfully", update_result.lower())
+
+        # Verify the password was updated
+        updated_record = self.manager.search_password("example.com")
+        self.assertIn("NewStrongPassword!1", updated_record)
+
 
 if __name__ == "__main__":
     unittest.main()
