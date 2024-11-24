@@ -365,7 +365,7 @@ class PasswordManagerUI:
         style = ttk.Style()
         style.theme_use('clam')
         style.configure("Treeview", background="#333333", foreground="white", fieldbackground="#333333", rowheight=30, font=('Arial', 12))
-        style.configure("Treeview.Heading", font=('Arial', 13, 'bold'))
+        style.configure("Treeview.Heading", font=('Arial', 20, 'bold'))
         style.map('Treeview', background=[('selected', '#1E90FF')])
 
         # Create Treeview
