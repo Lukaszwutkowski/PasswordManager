@@ -1,0 +1,131 @@
+2024-11-17 10:28:24,072 - INFO - Password for amazon.com saved successfully.
+2024-11-17 10:37:44,137 - INFO - Password for amazon.com retrieved successfully.
+2024-11-17 10:38:13,333 - INFO - Password for facebook.com saved successfully.
+2024-11-17 11:05:03,104 - INFO - Password for facebook.com retrieved successfully.
+2024-11-17 15:37:15,550 - INFO - Password for amazon.com retrieved successfully.
+2024-11-17 15:37:47,441 - INFO - Password for amazon.com saved successfully.
+2024-11-17 15:37:59,105 - INFO - Password for amazon.com retrieved successfully.
+2024-11-17 15:38:01,401 - INFO - Password for amazon.com retrieved successfully.
+2024-11-17 15:38:01,940 - INFO - Password for amazon.com retrieved successfully.
+2024-11-17 15:38:04,882 - INFO - Password for amazon.com retrieved successfully.
+2024-11-17 15:50:18,889 - INFO - Password for amazon.com retrieved successfully.
+2024-11-17 16:22:29,085 - INFO - Password for amazon.com retrieved successfully.
+2024-11-17 16:33:09,624 - INFO - Retrieved all passwords from the database.
+2024-11-17 16:33:45,852 - INFO - Retrieved all passwords from the database.
+2024-11-17 16:34:03,082 - INFO - Retrieved all passwords from the database.
+2024-11-17 16:34:34,338 - INFO - Retrieved all passwords from the database.
+2024-11-17 16:36:55,455 - INFO - Retrieved all passwords from the database.
+2024-11-17 16:46:00,091 - INFO - Retrieved all passwords from the database.
+2024-11-17 16:51:34,165 - INFO - Retrieved all passwords from the database.
+2024-11-17 16:51:40,670 - INFO - Attempting to delete password for website: amazon.com
+2024-11-17 16:51:40,671 - DEBUG - Existing record for amazon.com: ('amazon.com', 'example.com', 'gAAAAABnObc4R-PsNmPamyDxTxNbl7jJJuhZgza5aL1CR6uxP7F0ZRv9wKUPtsD1KQ9ZFsKFJXBCyePZGNu0mIgERuLBhaufCQ==')
+2024-11-17 16:51:40,676 - INFO - Password for amazon.com deleted successfully.
+2024-11-17 16:51:42,094 - INFO - Retrieved all passwords from the database.
+2024-11-17 16:52:07,017 - INFO - Password for amazon.com saved successfully.
+2024-11-17 16:52:10,529 - INFO - Retrieved all passwords from the database.
+2024-11-17 16:55:07,757 - INFO - Retrieved all passwords from the database.
+2024-11-17 16:55:51,504 - INFO - Attempting to update password for website: amazon.com
+2024-11-17 16:55:51,505 - ERROR - Failed to update password for amazon.com: ['Password must contain at least one special character (!@#$%^&*(), etc.).']
+2024-11-17 16:56:24,274 - INFO - Attempting to update password for website: amazon.com
+2024-11-17 16:56:24,275 - ERROR - Failed to update password for amazon.com: ['Password must contain at least one special character (!@#$%^&*(), etc.).']
+2024-11-17 17:01:57,091 - INFO - Retrieved all passwords from the database.
+2024-11-17 17:02:05,809 - INFO - Attempting to update password for website: amazon.com
+2024-11-17 17:02:05,810 - DEBUG - Existing record for amazon.com: ('amazon.com', 'example.com', 'gAAAAABnOhEn1iYdVuQfL4vhJf4BkSZPDCer49gTIuzrIchy1kkPExLyUf50hBxeTjtOXufVCQGmRwE9v3rmGtvASSePSt5onQ==')
+2024-11-17 17:02:05,811 - DEBUG - Encrypted password for amazon.com: gAAAAABnOhN9Cm0NOJ4QnBZe2hiJ6EN8ry7Pe6F2E9kp9SI8flpIvjIulo0CQgGTgGQmJlHQpnSdmvQ8pZAFeQOpFHTatBeTgA==
+2024-11-17 17:02:05,820 - INFO - Password for amazon.com updated successfully.
+2024-11-17 17:02:07,677 - INFO - Retrieved all passwords from the database.
+2024-11-17 17:02:14,162 - INFO - Retrieved all passwords from the database.
+2024-11-17 17:03:04,619 - INFO - Retrieved all passwords from the database.
+2024-11-17 17:05:22,447 - INFO - Retrieved all passwords from the database.
+2024-11-17 17:05:28,253 - INFO - Retrieved all passwords from the database.
+2024-11-17 17:05:39,391 - INFO - Attempting to update password for website: facebook.com
+2024-11-17 17:05:39,392 - DEBUG - Existing record for facebook.com: ('facebook.com', 'example.com', 'gAAAAABnObmFu8zKneC1j2R9BW7fmk7F6Mz6IeL6RXoS4QFhVAc_tOIHuNTanQGUHAZy8cN-ohYPM7oX_9aBs84q8Nrk6vBSlA==')
+2024-11-17 17:05:39,392 - DEBUG - Encrypted password for facebook.com: gAAAAABnOhRTS7M92InJ8g06Tvp4kT65jSMvkXZZCFVgJJOkZwB3x-19SgvnNB_CFj7Pxrusyep69mP-e8Gf97fllppw53Zypw==
+2024-11-17 17:05:39,401 - INFO - Password for facebook.com updated successfully.
+2024-11-17 17:05:41,110 - INFO - Retrieved all passwords from the database.
+2024-11-17 17:15:53,389 - INFO - Retrieved all passwords from the database.
+2024-11-17 17:18:24,479 - INFO - Retrieved all passwords from the database.
+2024-11-17 17:18:31,252 - INFO - Attempting to update password for website: facebook.com
+2024-11-17 17:18:31,252 - DEBUG - Existing record for facebook.com: ('facebook.com', 'example.com', 'gAAAAABnOhRTS7M92InJ8g06Tvp4kT65jSMvkXZZCFVgJJOkZwB3x-19SgvnNB_CFj7Pxrusyep69mP-e8Gf97fllppw53Zypw==')
+2024-11-17 17:18:31,252 - DEBUG - Encrypted password for facebook.com: gAAAAABnOhdXVFgYIljvh4hLbdRxluUECxIBYn2QQtNxrSTLpNH9FUxQ9-F68xebdH-zFCtDb0mc_KHpuzPCKd09aDiw8oH7Gw==
+2024-11-17 17:18:31,259 - INFO - Password for facebook.com updated successfully.
+2024-11-17 17:19:43,403 - INFO - Retrieved all passwords from the database.
+2024-11-17 17:19:50,059 - INFO - Attempting to delete password for website: amazon.com
+2024-11-17 17:19:50,060 - DEBUG - Existing record for amazon.com: ('amazon.com', 'example.com', 'gAAAAABnOhN9Cm0NOJ4QnBZe2hiJ6EN8ry7Pe6F2E9kp9SI8flpIvjIulo0CQgGTgGQmJlHQpnSdmvQ8pZAFeQOpFHTatBeTgA==')
+2024-11-17 17:19:50,067 - INFO - Password for amazon.com deleted successfully.
+2024-11-17 17:19:51,400 - INFO - Retrieved all passwords from the database.
+2024-11-17 17:30:35,624 - INFO - Retrieved all passwords from the database.
+2024-11-17 17:40:16,799 - INFO - Retrieved all passwords from the database.
+2024-11-17 18:27:37,194 - INFO - Retrieved all passwords from the database.
+2024-11-17 19:31:59,554 - INFO - Retrieved all passwords from the database.
+2024-11-17 20:21:29,494 - INFO - Retrieved all passwords from the database.
+2024-11-17 21:34:18,175 - INFO - Retrieved all passwords from the database.
+2024-11-17 21:39:12,796 - INFO - Password for facebook.com retrieved successfully.
+2024-11-17 21:54:57,607 - INFO - Retrieved all passwords from the database.
+2024-11-17 21:56:22,602 - INFO - Retrieved all passwords from the database.
+2024-11-17 21:57:24,680 - INFO - Retrieved all passwords from the database.
+2024-11-17 21:59:22,461 - INFO - Retrieved all passwords from the database.
+2024-11-17 22:12:42,274 - INFO - Retrieved all passwords from the database.
+2024-11-17 22:13:05,198 - INFO - Attempting to update password for website: facebook.com
+2024-11-17 22:13:05,200 - DEBUG - Existing record for facebook.com: ('facebook.com', 'example.com', 'gAAAAABnOhdXVFgYIljvh4hLbdRxluUECxIBYn2QQtNxrSTLpNH9FUxQ9-F68xebdH-zFCtDb0mc_KHpuzPCKd09aDiw8oH7Gw==')
+2024-11-17 22:13:05,201 - DEBUG - Encrypted password for facebook.com: gAAAAABnOlxhBcvDOQVso3DMI9A77T2nbWGEvXWkiO-pHGcQopO0EMrX2KMDg6cYpkKuqxzF3Y9rYPSJlIxNGf9qroNCrkjTVA==
+2024-11-17 22:13:05,209 - INFO - Password for facebook.com updated successfully.
+2024-11-17 22:13:30,439 - INFO - Retrieved all passwords from the database.
+2024-11-17 22:45:23,062 - INFO - Retrieved all passwords from the database.
+2024-11-17 22:45:31,311 - INFO - Attempting to update password for website: facebook.com
+2024-11-17 22:45:31,311 - DEBUG - Existing record for facebook.com: ('facebook.com', 'example.com', 'gAAAAABnOlxhBcvDOQVso3DMI9A77T2nbWGEvXWkiO-pHGcQopO0EMrX2KMDg6cYpkKuqxzF3Y9rYPSJlIxNGf9qroNCrkjTVA==')
+2024-11-17 22:45:31,312 - DEBUG - Encrypted password for facebook.com: gAAAAABnOmP7IXaFS0IBTs7yzjQF4n7bdxFkDcVR8ooFDF8IaJqjpoclJKToIFGNuxLPfql-hlxJGrHnXNDQJyUVEkyPwgxeIQ==
+2024-11-17 22:45:31,315 - INFO - Password for facebook.com updated successfully.
+2024-11-17 22:49:55,881 - INFO - Retrieved all passwords from the database.
+2024-11-17 22:53:46,012 - INFO - Retrieved all passwords from the database.
+2024-11-17 22:54:01,685 - INFO - Attempting to update password for website: facebook.com
+2024-11-17 22:54:01,687 - DEBUG - Existing record for facebook.com: ('facebook.com', 'example.com', 'gAAAAABnOmP7IXaFS0IBTs7yzjQF4n7bdxFkDcVR8ooFDF8IaJqjpoclJKToIFGNuxLPfql-hlxJGrHnXNDQJyUVEkyPwgxeIQ==')
+2024-11-17 22:54:01,687 - DEBUG - Encrypted password for facebook.com: gAAAAABnOmX5VdfkzcGSt160bIlABtrApVFTZGNGEy8Wwt3YWRh5GQHMLSKRZFP-3TZxRxP9PVS5PV0hRiQsIRUceQ3vQFgPXw==
+2024-11-17 22:54:01,694 - INFO - Password for facebook.com updated successfully.
+2024-11-17 22:54:03,152 - INFO - Retrieved all passwords from the database.
+2024-11-17 22:57:34,628 - INFO - Retrieved all passwords from the database.
+2024-11-17 22:57:51,219 - INFO - Attempting to update password for website: facebook.com
+2024-11-17 22:57:51,220 - DEBUG - Existing record for facebook.com: ('facebook.com', 'example.com', 'gAAAAABnOmX5VdfkzcGSt160bIlABtrApVFTZGNGEy8Wwt3YWRh5GQHMLSKRZFP-3TZxRxP9PVS5PV0hRiQsIRUceQ3vQFgPXw==')
+2024-11-17 22:57:51,221 - DEBUG - Encrypted password for facebook.com: gAAAAABnOmbfXc7JrxbKalpSweVK5S1eZ5-Gj-6Pz3h1hrUgTeS06xZgio14VeAw3KxaSmW24Jx5ZESrtz_8dRxLCbz236Yvtw==
+2024-11-17 22:57:51,230 - INFO - Password for facebook.com updated successfully.
+2024-11-17 22:57:53,040 - INFO - Retrieved all passwords from the database.
+2024-11-17 22:58:20,831 - INFO - Password for amazon.com saved successfully.
+2024-11-17 22:58:24,300 - INFO - Retrieved all passwords from the database.
+2024-11-17 22:58:34,840 - INFO - Attempting to delete password for website: amazon.com
+2024-11-17 22:58:34,841 - DEBUG - Existing record for amazon.com: ('amazon.com', 'example@.com', 'gAAAAABnOmb8iVCqxZtxC4MGLJeWBMz96KSiUe5B3PSWfGcTArG3DMCvCk1gNleMm4jrc-LJQ_xtzSYRYvsX3PZ_GP8V2sLWIA==')
+2024-11-17 22:58:34,844 - INFO - Password for amazon.com deleted successfully.
+2024-11-17 22:58:36,237 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:19:01,535 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:40:35,222 - INFO - Password for wp.pl saved successfully.
+2024-11-19 19:40:38,861 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:40:51,228 - INFO - Attempting to update password for website: facebook.com
+2024-11-19 19:40:51,230 - DEBUG - Existing record for facebook.com: ('facebook.com', 'example.com', 'gAAAAABnOmbfXc7JrxbKalpSweVK5S1eZ5-Gj-6Pz3h1hrUgTeS06xZgio14VeAw3KxaSmW24Jx5ZESrtz_8dRxLCbz236Yvtw==')
+2024-11-19 19:40:51,230 - DEBUG - Encrypted password for facebook.com: gAAAAABnPNuzAgMeUpefeVkQFMUJOJXjLb6EwPKuZBti8_IGUHC3UKkqnHB254WeeygHseXWA4en9OXYSVUwmgCPd9LJwKNFEQ==
+2024-11-19 19:40:51,238 - INFO - Password for facebook.com updated successfully.
+2024-11-19 19:40:52,900 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:41:13,877 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:42:25,104 - INFO - Password for test.com saved successfully.
+2024-11-19 19:42:31,879 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:42:42,989 - INFO - Attempting to delete password for website: test.com
+2024-11-19 19:42:42,991 - DEBUG - Existing record for test.com: ('test.com', 'test', 'gAAAAABnPNwRQIslaen0JXLt9JlIAU-43g0CqMgWM9QAbNvkDx2AzLTCyGAV2LEpLBRN4avDEKYbMVKJvsAG7ArHxcVIi_5Mbg==')
+2024-11-19 19:42:43,001 - INFO - Password for test.com deleted successfully.
+2024-11-19 19:42:44,241 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:43:39,293 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:49:44,273 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:49:59,657 - INFO - Password for amazon.com saved successfully.
+2024-11-19 19:50:13,388 - INFO - Password for facebook.com saved successfully.
+2024-11-19 19:50:35,194 - INFO - Password for test.com saved successfully.
+2024-11-19 19:50:38,636 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:50:49,105 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:50:56,653 - INFO - Attempting to update password for website: amazon.com
+2024-11-19 19:50:56,654 - DEBUG - Existing record for amazon.com: ('amazon.com', 'test', 'gAAAAABnPN3XFskMe3RUursVDDi9OLlU-sFWC7Y--ZRwIUMdHyjracCUIenR_5ZlZKluS64F7nqRbwopkXFOfdPzPQRn55j9Gw==')
+2024-11-19 19:50:56,655 - DEBUG - Encrypted password for amazon.com: gAAAAABnPN4QXFGbU9F0wwK2lG4oT7IZT638X39aCL7HRqIJ0BW0QDJir1DwsjaXk3gudrHzpBpk2WR1mMVRpTax4M0gToSyCA==
+2024-11-19 19:50:56,664 - INFO - Password for amazon.com updated successfully.
+2024-11-19 19:50:58,001 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:52:04,950 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:52:29,352 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:56:48,258 - INFO - Retrieved all passwords from the database.
+2024-11-19 19:57:56,274 - INFO - Retrieved all passwords from the database.
+2024-11-19 20:01:27,332 - INFO - Retrieved all passwords from the database.
+2024-11-19 20:01:49,873 - INFO - Retrieved all passwords from the database.
+2024-11-24 16:53:53,612 - INFO - Retrieved all passwords from the database.
