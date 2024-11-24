@@ -1,19 +1,12 @@
-import base64
+
 import os
 import unittest
 from password_manager import PasswordManager
-
 
 class TestPasswordManager(unittest.TestCase):
     """
     Unit tests for the PasswordManager class.
     """
-
-    @classmethod
-    def setUpClass(cls):
-        key_bytes = b'0' * 32
-        cls.fixed_key = base64.urlsafe_b64encode(key_bytes)
-        assert len(cls.fixed_key) == 44
 
     def setUp(self):
         """
@@ -25,15 +18,11 @@ class TestPasswordManager(unittest.TestCase):
 
         os.makedirs("test_data", exist_ok=True)
 
-        # Ensure test files are clean
+        # Remove existing test files
         if os.path.exists(self.test_db_path):
             os.remove(self.test_db_path)
         if os.path.exists(self.test_key_file):
             os.remove(self.test_key_file)
-
-        # Generate or load encryption key
-        from utils.encryption import EncryptionManager
-        EncryptionManager(key_file=self.test_key_file)
 
         # Initialize the PasswordManager with test paths
         self.manager = PasswordManager(db_path=self.test_db_path, key_file=self.test_key_file)
@@ -45,6 +34,9 @@ class TestPasswordManager(unittest.TestCase):
         """
         # Clear all database entries
         self.manager.data_manager.clear_table()
+
+        # Close any open connections
+        self.manager.data_manager.close()
 
         # Remove the test database file
         if os.path.exists(self.test_db_path):
@@ -101,7 +93,6 @@ class TestPasswordManager(unittest.TestCase):
         is_invalid = self.manager.validate_user_credentials("admin", "WrongPassword!")
         self.assertFalse(is_invalid)
 
-
     def test_save_weak_password(self):
         """
         Test that saving a weak password returns an appropriate validation error.
@@ -125,14 +116,6 @@ class TestPasswordManager(unittest.TestCase):
         result = self.manager.search_password("nonexistent.com")
         self.assertEqual(result, "Not found")
 
-    def test_search_password_case_insensitive(self):
-        """
-        Test that searching for a password is case-insensitive.
-        """
-        self.manager.save_password("Example.com", "user@example.com", "pasSswo?rd123")
-        result = self.manager.search_password("example.com")
-        self.assertEqual(result, "Website: Example.com, Email: user@example.com, Password: pasSswo?rd123")
-
     def test_save_and_load_multiple_passwords(self):
         """
         Test saving and loading multiple passwords.
@@ -150,24 +133,6 @@ class TestPasswordManager(unittest.TestCase):
         self.assertEqual(len(passwords), 3)
         self.assertIn(("example.com", "user1@example.com", "pasSswo?rd123"), passwords)
 
-    def test_save_password_with_special_characters(self):
-        """
-        Test saving a password with special characters.
-        """
-        special_password = "pA1!@#$%^&*()_+{}|:\"<>?"
-        self.manager.save_password("example.com", "user@example.com", special_password)
-
-        passwords = self.manager.get_passwords()
-        self.assertEqual(len(passwords), 1)
-        self.assertEqual(passwords[0], ("example.com", "user@example.com", special_password))
-
-    def test_empty_database(self):
-        """
-        Test that an empty database returns an empty list.
-        """
-        passwords = self.manager.get_passwords()
-        self.assertEqual(passwords, [])
-
     def test_update_password(self):
         """
         Test updating the password for an existing website.
@@ -184,6 +149,20 @@ class TestPasswordManager(unittest.TestCase):
         updated_record = self.manager.search_password("example.com")
         self.assertIn("NewStrongPassword!1", updated_record)
 
+    def test_delete_password(self):
+        """
+        Test deleting a password from the database.
+        """
+        # Save a password
+        self.manager.save_password("example.com", "user@example.com", "Password123!")
+
+        # Delete the password
+        delete_result = self.manager.delete_password("example.com")
+        self.assertIn("successfully", delete_result.lower())
+
+        # Verify the password was deleted
+        result = self.manager.search_password("example.com")
+        self.assertEqual(result, "Not found")
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,6 @@
-from dbm import sqlite3
+# password_manager.py
 
+import bcrypt
 from data_manager import DataManager
 from utils.encryption import EncryptionManager
 from utils.password_generation import generate_strong_password
@@ -11,7 +12,8 @@ class PasswordManager:
     Manages passwords by encrypting them and interacting with the DataManager for storage.
     """
 
-    def __init__(self, db_path="data/passwords.db", key_file="data/key.key", log_file="logs/app.log", key=None):
+    def __init__(self, db_path="data/passwords.db", key_file="data/key.key",
+                 log_file="logs/app.log", key=None):
         """
         Initializes the PasswordManager.
 
@@ -21,10 +23,13 @@ class PasswordManager:
             key (bytes): Encryption key. If provided, key_file is ignored.
         """
         self.encryption_manager = EncryptionManager(key_file=key_file, key=key)
-        self.data_manager = DataManager(db_path=db_path, key_file=key_file, key=key)
+        self.data_manager = DataManager(db_path=db_path)
         self.logger = Logger(log_file=log_file)
         self.key_file = key_file
         self.key = key
+
+        # Ensure the admin user exists
+        self.data_manager.ensure_admin_user()
 
     def validate_user_credentials(self, username, password):
         """
@@ -37,12 +42,16 @@ class PasswordManager:
         Returns:
             bool: True if credentials are valid, False otherwise.
         """
-        # Fetch the encrypted password for the given username
         user_record = self.data_manager.get_user_by_username(username)
         if user_record:
-            encrypted_password = user_record[0]
-            decrypted_password = self.encryption_manager.decrypt(encrypted_password)
-            return decrypted_password == password
+            hashed_password = user_record[0]
+            # Ensure hashed_password is bytes
+            if isinstance(hashed_password, str):
+                hashed_password = hashed_password.encode()
+            elif isinstance(hashed_password, memoryview):
+                hashed_password = hashed_password.tobytes()
+            # Verify the password using bcrypt
+            return bcrypt.checkpw(password.encode(), hashed_password)
         return False
 
     def update_admin_password(self, new_password):
@@ -60,8 +69,11 @@ class PasswordManager:
         if not is_valid:
             return f"Password is too weak:\n" + "\n".join(messages)
 
+        # Hash the new password with salt
+        hashed_password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
+
         # Update the password in the database
-        self.data_manager.update_admin_password(new_password)
+        self.data_manager.update_admin_password(hashed_password)
         return "Admin password updated successfully!"
 
     def save_password(self, website, email, password):
@@ -128,11 +140,8 @@ class PasswordManager:
                 return f"Website: {website}, Email: {email}, Password: {password}"
             self.logger.warning(f"Password for {website} not found.")
             return "Not found"
-        except sqlite3.Error as e:
-            self.logger.error(f"Database error: {str(e)}")
-            return "Database error occurred while searching for the password."
         except Exception as e:
-            self.logger.error(f"Error decrypting password: {str(e)}")
+            self.logger.error(f"Error retrieving password: {str(e)}")
             return "Error occurred while searching for the password."
 
     def generate_strong_password(self, length=12):
@@ -166,13 +175,11 @@ class PasswordManager:
             return f"Password is too weak:\n" + "\n".join(validation_messages)
 
         existing_record = self.data_manager.search_password(website)
-        self.logger.debug(f"Existing record for {website}: {existing_record}")
         if not existing_record:
             self.logger.warning(f"Failed to update password: {website} not found.")
             return "Error: Website not found."
 
         encrypted_password = self.encryption_manager.encrypt(new_password)
-        self.logger.debug(f"Encrypted password for {website}: {encrypted_password}")
         self.data_manager.update_password(website, encrypted_password)
         self.logger.info(f"Password for {website} updated successfully.")
         return "Password updated successfully."
@@ -191,7 +198,6 @@ class PasswordManager:
 
         # Check if the website exists in the database
         existing_record = self.data_manager.search_password(website)
-        self.logger.debug(f"Existing record for {website}: {existing_record}")
         if not existing_record:
             self.logger.warning(f"Failed to delete password: {website} not found.")
             return "Error: Website not found."
@@ -211,14 +217,17 @@ class PasswordManager:
         Returns:
             bool: True if the password is correct, False otherwise.
         """
-        # Fetch the encrypted password for the admin user
+        # Fetch the hashed password for the admin user
         user_record = self.data_manager.get_user_by_username("admin")
         if user_record:
-            encrypted_password = user_record[0]
-            # Decrypt the stored password
-            decrypted_password = self.encryption_manager.decrypt(encrypted_password)
-            # Compare the decrypted password with the provided current password
-            return decrypted_password == current_password
+            hashed_password = user_record[0]
+            # Ensure hashed_password is bytes
+            if isinstance(hashed_password, str):
+                hashed_password = hashed_password.encode()
+            elif isinstance(hashed_password, memoryview):
+                hashed_password = hashed_password.tobytes()
+            # Verify the password using bcrypt
+            return bcrypt.checkpw(current_password.encode(), hashed_password)
         return False
 
     def close(self):

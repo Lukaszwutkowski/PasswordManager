@@ -1,7 +1,7 @@
+
 import os
 import unittest
 from data_manager import DataManager
-
 
 class TestDataManager(unittest.TestCase):
     """
@@ -13,7 +13,9 @@ class TestDataManager(unittest.TestCase):
         Set up a test environment before each test.
         Creates a temporary test database.
         """
-        self.test_db_path = "test_passwords.db"
+        self.test_db_path = "test_data/test_passwords.db"
+        # Ensure the test_data directory exists
+        os.makedirs(os.path.dirname(self.test_db_path), exist_ok=True)
         self.data_manager = DataManager(db_path=self.test_db_path)
 
     def tearDown(self):
@@ -21,12 +23,17 @@ class TestDataManager(unittest.TestCase):
         Clean up the test environment after each test.
         Deletes all entries in the database and removes the database file.
         """
-        # Clear the database table to release any locks
+        # Clear the database tables to release any locks
         self.data_manager.clear_table()
 
         # Remove the database file
         if os.path.exists(self.test_db_path):
             os.remove(self.test_db_path)
+
+        # Remove the test_data directory if empty
+        test_data_dir = os.path.dirname(self.test_db_path)
+        if os.path.exists(test_data_dir) and not os.listdir(test_data_dir):
+            os.rmdir(test_data_dir)
 
     def test_create_table(self):
         """
@@ -128,7 +135,6 @@ class TestDataManager(unittest.TestCase):
         # Verify the password was deleted
         result = self.data_manager.search_password("example.com")
         self.assertIsNone(result)
-
 
 if __name__ == "__main__":
     unittest.main()
