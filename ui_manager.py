@@ -1,7 +1,12 @@
+import os
+
 import customtkinter as ctk
 import tkinter.messagebox as messagebox
 from tkinter import ttk
 import pyperclip
+from PIL import Image
+from customtkinter import CTkImage
+
 
 from password_manager import PasswordManager
 from utils.password_validation import PasswordValidator
@@ -19,12 +24,21 @@ class PasswordManagerUI:
             Sets up the main window and displays the login screen.
         """
         self.manager = PasswordManager()
-        ctk.set_appearance_mode("Dark")  # Opcje: "System", "Dark", "Light"
-        ctk.set_default_color_theme("dark-blue")  # Opcje: "blue", "green", "dark-blue"
+        ctk.set_appearance_mode("Dark")
+        ctk.set_default_color_theme("dark-blue")
 
         self.window = ctk.CTk()
         self.window.title("Password Manager")
-        self.window.geometry("862x519")
+        self.window.geometry("862x640")
+
+        # Load the logo image
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(script_dir, 'data', 'Password Manager (2).png')
+        try:
+            self.logo_image = CTkImage(Image.open(image_path), size=(200, 200))
+        except Exception as e:
+            print(f"Error loading image: {e}")
+            self.logo_image = None
 
         # Language selection variable
         self.language = "English"
@@ -142,6 +156,13 @@ class PasswordManagerUI:
         self.language_var = ctk.StringVar(value=self.language)
         language_menu = ctk.CTkOptionMenu(frame, values=language_options, command=self.change_language, variable=self.language_var)
         language_menu.pack(pady=10, anchor="ne", padx=10)
+
+        # Display the logo image
+        if self.logo_image:
+            logo_label = ctk.CTkLabel(frame, image=self.logo_image, text="")
+            logo_label.pack(pady=10)
+        else:
+            print("Logo image not loaded.")
 
         # Login Title
         ctk.CTkLabel(frame, text=self.texts["login"], font=ctk.CTkFont(size=24, weight="bold")).pack(pady=(30, 20))
@@ -273,6 +294,13 @@ class PasswordManagerUI:
         # Main screen title
         ctk.CTkLabel(frame, text=self.texts["password_manager"], font=ctk.CTkFont(size=24, weight="bold")).pack(pady=10)
 
+        # Display the logo image
+        if self.logo_image:
+            logo_label = ctk.CTkLabel(frame, image=self.logo_image, text="")
+            logo_label.pack(pady=10)
+        else:
+            print("Logo image not loaded.")
+
         # Website input
         self.website_entry = ctk.CTkEntry(frame, placeholder_text=self.texts["website"], width=300)
         self.website_entry.pack(pady=10)
@@ -354,6 +382,11 @@ class PasswordManagerUI:
         password_window = ctk.CTkToplevel(self.window)
         password_window.title(self.texts["saved_passwords"])
         password_window.geometry("800x600")
+
+        # Bring the window to the front
+        password_window.lift()
+        password_window.attributes('-topmost', True)
+        password_window.after_idle(password_window.attributes, '-topmost', False)
 
         ctk.CTkLabel(password_window, text=self.texts["saved_passwords"], font=ctk.CTkFont(size=22, weight="bold")).pack(pady=10)
 
