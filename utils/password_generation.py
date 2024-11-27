@@ -1,7 +1,7 @@
 import random
 import string
 
-def generate_strong_password(length=12):
+def generate_strong_password(length=18):
     """
     Generates a strong random password.
 
@@ -11,8 +11,8 @@ def generate_strong_password(length=12):
     Returns:
         str: A randomly generated strong password.
     """
-    if length < 8:
-        raise ValueError("Password length must be at least 8 characters.")
+    if length < 12:
+        raise ValueError("Password length must be at least 12 characters.")
 
     # Define character sets
     lowercase = string.ascii_lowercase
