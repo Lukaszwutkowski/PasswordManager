@@ -21,9 +21,9 @@ class PasswordValidator:
         is_valid = True
 
         # Minimum length check
-        if len(password) < 8:
+        if len(password) < 12:
             is_valid = False
-            messages.append("Password must be at least 8 characters long.")
+            messages.append("Password must be at least 12 characters long.")
 
         # Uppercase and lowercase letter check
         if not any(char.islower() for char in password) or not any(char.isupper() for char in password):

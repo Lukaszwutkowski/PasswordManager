@@ -44,8 +44,108 @@ class PasswordManagerUI:
         self.language = "English"
         self.texts = self.load_language_texts(self.language)
 
-        # Start with login screen
-        self.show_login_screen()
+        # Check if it's the first run and display the appropriate screen
+        if not self.manager.is_configured():
+            self.show_first_run_screen()
+        else:
+            self.current_screen = "login"
+            self.show_login_screen()
+
+    def show_first_run_screen(self):
+        """
+        Displays the first-time setup screen to set a master password.
+        Allows the user to input a master password, confirm it, and optionally generate a strong password.
+        Includes options for changing the language.
+        """
+        self.current_screen = "first_run"
+        self.clear_window()
+
+        frame = ctk.CTkFrame(self.window)
+        frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # Language selection dropdown
+        language_menu = ctk.CTkOptionMenu(
+            frame,
+            values=["English", "Polish"],
+            command=self.change_language,
+            variable=ctk.StringVar(value=self.language),
+        )
+        language_menu.pack(pady=10, anchor="ne", padx=10)
+
+        # Display the logo image
+        if self.logo_image:
+            logo_label = ctk.CTkLabel(frame, image=self.logo_image, text="")
+            logo_label.pack(pady=10)
+
+        # Title for first run setup
+        ctk.CTkLabel(
+            frame,
+            text=self.texts["first_run_title"],
+            font=ctk.CTkFont(size=24, weight="bold"),
+        ).pack(pady=20)
+
+        # Note about the importance of remembering the password
+        ctk.CTkLabel(
+            frame,
+            text=self.texts["password_note"],
+            font=ctk.CTkFont(size=14),
+            wraplength=600,
+            justify="center",
+        ).pack(pady=10)
+
+        # Master password input field with toggle visibility
+        master_password_entry = ctk.CTkEntry(
+            frame, placeholder_text=self.texts["master_password"], show="*", width=300
+        )
+        master_password_entry.pack(pady=10)
+
+        # State variable for visibility
+        master_password_state = {"visible": False}
+
+        # Button to toggle visibility
+        master_password_toggle = ctk.CTkButton(
+            frame,
+            text="👁️",
+            width=40,
+            command=lambda: self.toggle_password_visibility(master_password_entry, master_password_toggle,
+                                                            master_password_state),
+        )
+        master_password_toggle.place(relx=0.69, rely=0.658)  # Adjust position relative to the entry
+
+        # Confirm master password input field with toggle visibility
+        confirm_password_entry = ctk.CTkEntry(
+            frame, placeholder_text=self.texts["confirm_password"], show="*", width=300
+        )
+        confirm_password_entry.pack(pady=10)
+
+        # State variable for visibility
+        confirm_password_state = {"visible": False}
+
+        # Button to toggle visibility
+        confirm_password_toggle = ctk.CTkButton(
+            frame,
+            text="👁️",
+            width=40,
+            command=lambda: self.toggle_password_visibility(confirm_password_entry, confirm_password_toggle,
+                                                            confirm_password_state),
+        )
+        confirm_password_toggle.place(relx=0.69, rely=0.738)
+
+        # Button to generate a strong password
+        ctk.CTkButton(
+            frame,
+            text=self.texts["generate_password"],
+            command=lambda: self.generate_password(master_password_entry, confirm_password_entry),
+            width=200,
+        ).pack(pady=10)
+
+        # Button to save the master password
+        ctk.CTkButton(
+            frame,
+            text=self.texts["save_password"],
+            command=lambda: self.save_master_password(master_password_entry, confirm_password_entry),
+            width=200,
+        ).pack(pady=20)
 
     def load_language_texts(self, language):
         """
@@ -54,6 +154,12 @@ class PasswordManagerUI:
         texts = {}
         if language == "English":
             texts = {
+                "first_run_title": "Welcome to Password Manager",
+                "master_password": "Enter Master Password",
+                "confirm_password": "Confirm Master Password",
+                "password_mismatch": "Passwords do not match. Please try again.",
+                "weak_password": "Password is too weak:\n",
+                "password_note": "Please remember or write down your master password. It cannot be recovered!",
                 "login": "Login",
                 "username": "Username",
                 "password": "Password",
@@ -98,6 +204,12 @@ class PasswordManagerUI:
             }
         elif language == "Polish":
             texts = {
+                "first_run_title": "Witamy w Menedżerze Haseł",
+                "master_password": "Wprowadź hasło główne",
+                "confirm_password": "Potwierdź hasło główne",
+                "password_mismatch": "Hasła nie są takie same. Spróbuj ponownie.",
+                "weak_password": "Hasło jest za słabe:\n",
+                "password_note": "Zapamiętaj lub zapisz swoje hasło główne. Nie można go odzyskać!",
                 "login": "Logowanie",
                 "username": "Nazwa użytkownika",
                 "password": "Hasło",
@@ -146,6 +258,7 @@ class PasswordManagerUI:
         """
             Displays the login screen for the user to input their username and password.
         """
+        self.current_screen = "login"
         self.clear_window()
 
         frame = ctk.CTkFrame(self.window)
@@ -163,6 +276,18 @@ class PasswordManagerUI:
             logo_label.pack(pady=10)
         else:
             print("Logo image not loaded.")
+
+            # State variable for visibility
+        password_state = {"visible": False}
+
+        # Button to toggle visibility
+        password_toggle = ctk.CTkButton(
+            frame,
+            text="👁️",
+            width=40,
+            command=lambda: self.toggle_password_visibility(self.password_entry, password_toggle, password_state),
+        )
+        password_toggle.place(relx=0.69, rely=0.635)
 
         # Login Title
         ctk.CTkLabel(frame, text=self.texts["login"], font=ctk.CTkFont(size=24, weight="bold")).pack(pady=(30, 20))
@@ -187,8 +312,15 @@ class PasswordManagerUI:
         """
         self.language = choice
         self.texts = self.load_language_texts(self.language)
+
         # Refresh the current screen
-        self.show_login_screen()
+        if hasattr(self, "current_screen"):
+            if self.current_screen == "first_run":
+                self.show_first_run_screen()
+            elif self.current_screen == "login":
+                self.show_login_screen()
+            else:
+                self.show_main_screen()
 
     def show_change_user_password_screen(self):
         """
@@ -314,18 +446,26 @@ class PasswordManagerUI:
         self.password_entry.pack(pady=10)
 
         # Buttons for generating, saving, and viewing passwords
-        ctk.CTkButton(frame, text=self.texts["generate_password"], command=self.generate_password, width=200).pack(pady=10)
+        ctk.CTkButton(frame, text=self.texts["generate_password"], command=lambda: self.generate_password(self.password_entry), width=200).pack(pady=10)
         ctk.CTkButton(frame, text=self.texts["save_password_button"], command=self.save_password, width=200).pack(pady=10)
         ctk.CTkButton(frame, text=self.texts["view_all_passwords"], command=self.show_password_list_screen, width=200).pack(pady=10)
         ctk.CTkButton(frame, text=self.texts["logout"], command=self.logout_user, width=200).pack(pady=10)
 
-    def generate_password(self):
+    def generate_password(self, *fields):
         """
-            Generates a strong password and displays it in the password field.
+        Generates a strong password and populates the provided input fields.
+
+        Args:
+            *fields: CTkEntry input fields to populate with the generated password.
         """
-        password = self.manager.generate_strong_password()
-        self.password_entry.delete(0, ctk.END)
-        self.password_entry.insert(0, password)
+        try:
+            password = self.manager.generate_strong_password()
+            for field in fields:
+                if field:  # Ensure the field is valid
+                    field.delete(0, ctk.END)  # Clear the field
+                    field.insert(0, password)  # Insert the generated password
+        except Exception as e:
+            print(f"Error generating password: {e}")
 
     def save_password(self):
         """
@@ -548,11 +688,60 @@ class PasswordManagerUI:
         # Hide the parent window while editing
         parent_window.withdraw()
 
+    def save_master_password(self, master_password_entry, confirm_password_entry):
+        """
+        Saves the master password after validating it.
+
+        Args:
+            master_password_entry (CTkEntry): The field for entering the master password.
+            confirm_password_entry (CTkEntry): The field for confirming the master password.
+        """
+        master_password = master_password_entry.get()
+        confirm_password = confirm_password_entry.get()
+
+        # Validate that the passwords match
+        if master_password != confirm_password:
+            messagebox.showerror(title=self.texts["error"], message=self.texts["password_mismatch"])
+            return
+
+        # Validate the strength of the password
+        is_valid, messages = PasswordValidator.validate_password_strength(master_password)
+        if not is_valid:
+            messagebox.showerror(title=self.texts["error"], message=self.texts["weak_password"] + "\n".join(messages))
+            return
+
+        # Save the master password
+        self.manager.save_master_password(master_password)
+        self.manager.mark_as_configured()
+
+        messagebox.showinfo(title=self.texts["success"], message=self.texts["password_saved"])
+
+        # Redirect to login screen after setting the password
+        self.show_login_screen()
+
     def run(self):
         """
             Starts the Tkinter event loop to run the application.
         """
         self.window.mainloop()
+
+    def toggle_password_visibility(self, entry, button, state):
+        """
+        Toggles the visibility of the password in the entry field.
+
+        Args:
+            entry: The CTkEntry field containing the password.
+            button: The button used to toggle the visibility.
+            state: A mutable variable (list or dictionary) tracking the visibility state.
+        """
+        if state["visible"]:
+            entry.configure(show="*")  # Hide password
+            button.configure(text="👁️")
+            state["visible"] = False
+        else:
+            entry.configure(show="")  # Show password
+            button.configure(text="👁️‍🗨️")
+            state["visible"] = True
 
 
 if __name__ == "__main__":
